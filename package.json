@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm install && npm run build",
+    "build": "npm install",
     "start": "node server.js"
   },
   "dependencies": {
