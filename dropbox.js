@@ -175,3 +175,44 @@ export async function downloadFile(entry) {
     writer.on("error", reject);
   });
 }
+
+import axios from "axios";
+
+const STATE_PATH = "/sync-state/state.json"; // dedicated folder in Dropbox
+
+export async function downloadState() {
+  try {
+    const res = await axios({
+      method: "post",
+      url: "https://content.dropboxapi.com/2/files/download",
+      responseType: "json",
+      headers: {
+        Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+        "Dropbox-API-Arg": JSON.stringify({ path: STATE_PATH }),
+        "Content-Type": "application/octet-stream",
+      },
+    });
+    return res.data;
+  } catch (err) {
+    // file not found → return empty initial state
+    return { cursor: null, processedFiles: [] };
+  }
+}
+
+export async function uploadState(state) {
+  await axios({
+    method: "post",
+    url: "https://content.dropboxapi.com/2/files/upload",
+    headers: {
+      Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+      "Dropbox-API-Arg": JSON.stringify({
+        path: STATE_PATH,
+        mode: "overwrite",
+        autorename: false,
+        mute: true,
+      }),
+      "Content-Type": "application/octet-stream",
+    },
+    data: JSON.stringify(state),
+  });
+}
