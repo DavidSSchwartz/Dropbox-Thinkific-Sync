@@ -16,4 +16,3 @@ export async function uploadToThinkific({ filePath, parsed }) {
   // placeholder
   return true;
 }
-
