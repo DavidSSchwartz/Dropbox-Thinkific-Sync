@@ -55,7 +55,7 @@ export async function syncDropboxFolder() {
       entries = res.data.entries;
       cursor = res.data.cursor;
     }
-
+    console.log({ entries });
     for (const entry of entries) {
       if (entry[".tag"] !== "file") continue;
       if (state.processedFiles.includes(entry.id)) continue; // skip duplicates
@@ -64,7 +64,7 @@ export async function syncDropboxFolder() {
 
       // Download fixed
       const dropboxStream = await downloadFromDropbox(entry.path_lower);
-
+      console.log({ dropboxStream, cursor });
       // Upload to Thinkific
       await uploadToThinkific(dropboxStream, entry.name);
 
