@@ -56,27 +56,42 @@ export async function syncDropboxFolder() {
       cursor = res.data.cursor;
     }
     console.log({ entries });
-    for (const entry of entries) {
-      if (entry[".tag"] !== "file") continue;
-      if (state.processedFiles.includes(entry.id)) continue; // skip duplicates
-
-      console.log("Processing:", entry.name);
-
-      // Download fixed
-      const dropboxStream = await downloadFromDropbox(entry.path_lower);
-      console.log({ dropboxStream, cursor });
-      // Upload to Thinkific
-      await uploadToThinkific(dropboxStream, entry.name);
-
-      // Mark processed
-      state.processedFiles.push(entry.id);
-      saveState({ ...state, cursor }); // save after each file
-    }
-
-    // Save cursor if no files processed
-    saveState({ ...state, cursor });
+    await processEntries(entries, state);
     console.log("Sync complete.");
   } catch (err) {
     console.error("Sync error:", err.message || err);
+  }
+}
+
+async function processEntries(entries, state) {
+  for (const entry of entries) {
+    if (entry[".tag"] === "folder") {
+      // Recursively list folder contents
+      const res = await axios.post(
+        "https://api.dropboxapi.com/2/files/list_folder",
+        { path: entry.path_lower },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      await processEntries(res.data.entries, state); // recursion
+      continue;
+    }
+
+    if (entry[".tag"] === "file") {
+      if (state.processedFiles.includes(entry.id)) continue;
+
+      console.log("Processing file:", entry.name);
+
+      const dropboxStream = await downloadFromDropbox(entry.path_lower);
+      await uploadToThinkific(dropboxStream, entry.name);
+
+      state.processedFiles.push(entry.id);
+      saveState({ ...state, cursor: state.cursor });
+    }
   }
 }
