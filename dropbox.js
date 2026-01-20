@@ -176,8 +176,6 @@ export async function downloadFile(entry) {
   });
 }
 
-import axios from "axios";
-
 const STATE_PATH = "/sync-state/state.json"; // dedicated folder in Dropbox
 
 export async function downloadState() {
