@@ -35,29 +35,50 @@ export async function listNewFiles() {
 export async function downloadFile(entry) {
   const localPath = path.join("/tmp", path.basename(entry.path_lower));
 
-  const res = await axios.post(
-    `${DROPBOX_CONTENT}/files/download`,
-    undefined, // 🚨 IMPORTANT: NOT null
-    {
-      headers: {
-        ...authHeaders().headers,
-        "Dropbox-API-Arg": JSON.stringify({
-          path: entry.path_lower,
-        }),
-        // 🚫 DO NOT set Content-Type
-      },
+  // const res = await axios.post(
+  //   `${DROPBOX_CONTENT}/files/download`,
+  //   undefined, // 🚨 IMPORTANT: NOT null
+  //   {
+  //     headers: {
+  //       ...authHeaders().headers,
+  //       "Dropbox-API-Arg": JSON.stringify({
+  //         path: entry.path_lower,
+  //       }),
+  //       // 🚫 DO NOT set Content-Type
+  //     },
+  //     responseType: "stream",
+  //   }
+  // );
+  console.log("Downloading:", entry.path_lower);
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${DROPBOX_CONTENT}/files/download`,
       responseType: "stream",
+      headers: {
+        Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+        "Dropbox-API-Arg": JSON.stringify({
+          path: entry.path_lower, // MUST start with /
+        }),
+      },
+      data: null, // 🔥 THIS IS CRITICAL
+    });
+
+    await new Promise((resolve, reject) => {
+      const stream = fs.createWriteStream(localPath);
+      res.data.pipe(stream);
+      stream.on("finish", resolve);
+      stream.on("error", reject);
+    });
+  } catch (err) {
+    if (err.response?.data) {
+      err.response.data.on("data", (chunk) => {
+        console.error(chunk.toString());
+      });
+    } else {
+      console.error(err.message);
     }
-  );
-console.log("Downloading:", entry.path_lower);
-
-  await new Promise((resolve, reject) => {
-    const stream = fs.createWriteStream(localPath);
-    res.data.pipe(stream);
-    stream.on("finish", resolve);
-    stream.on("error", reject);
-  });
-
+  }
   return localPath;
 }
 
