@@ -57,6 +57,7 @@ export async function downloadFile(entry) {
       responseType: "stream",
       headers: {
         Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+        "Content-Type": "application/octet-stream",
         "Dropbox-API-Arg": JSON.stringify({
           path: entry.path_lower, // MUST start with /
         }),
