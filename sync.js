@@ -88,10 +88,25 @@ async function processEntries(entries, state) {
       console.log("Processing file:", entry.name);
 
       const dropboxStream = await downloadFromDropbox(entry.path_lower);
-      await uploadToThinkific(dropboxStream, entry.name);
+       const parsed = parsePath(entry.path_lower);
+      await uploadToThinkific(dropboxStream, parsed);
 
       state.processedFiles.push(entry.id);
       saveState({ ...state, cursor: state.cursor });
     }
   }
+}
+function parsePath(path) {
+  /**
+   * Example:
+   * /Cycle 1/Course A/Chapter 3/Lesson.pdf
+   */
+  const parts = path.split("/").filter(Boolean);
+
+  return {
+    cycle: parts[0],
+    course: parts[1],
+    chapter: parts[2],
+    lessonName: parts[3],
+  };
 }
