@@ -15,7 +15,7 @@ export async function listNewFiles() {
       `${DROPBOX_API}/files/list_folder`,
       {
         path: "",
-        recursive: true
+        recursive: true,
       },
       authHeaders()
     );
@@ -29,9 +29,7 @@ export async function listNewFiles() {
 
   cursor = response.data.cursor;
 
-  return response.data.entries.filter(
-    e => e[".tag"] === "file"
-  );
+  return response.data.entries.filter((e) => e[".tag"] === "file");
 }
 
 export async function downloadFile(entry) {
@@ -39,17 +37,19 @@ export async function downloadFile(entry) {
 
   const res = await axios.post(
     `${DROPBOX_CONTENT}/files/download`,
-    null,
+    undefined, // 🚨 IMPORTANT: NOT null
     {
       headers: {
         ...authHeaders().headers,
         "Dropbox-API-Arg": JSON.stringify({
-          path: entry.path_lower
-        })
+          path: entry.path_lower,
+        }),
+        // 🚫 DO NOT set Content-Type
       },
-      responseType: "stream"
+      responseType: "stream",
     }
   );
+console.log("Downloading:", entry.path_lower);
 
   await new Promise((resolve, reject) => {
     const stream = fs.createWriteStream(localPath);
@@ -65,8 +65,6 @@ function authHeaders() {
   return {
     headers: {
       Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
-      "Content-Type": "application/json"
-    }
+    },
   };
 }
-
