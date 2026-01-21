@@ -97,7 +97,7 @@ app.get("/webhook/dropbox", (req, res) => {
 let isSyncing = false;
 
 // Dropbox webhook trigger
-app.post("/webhook/dropbox", async (req, res) => {
+app.post("/webhook/dropbox", (req, res) => {
   res.sendStatus(200); // respond immediately
 
   if (isSyncing) {
@@ -108,11 +108,15 @@ app.post("/webhook/dropbox", async (req, res) => {
   isSyncing = true;
   console.log("Dropbox webhook received");
 
-  try {
-    await handleDropboxEvent();
-  } finally {
-    isSyncing = false;
-  }
+  (async () => {
+    try {
+      await handleDropboxEvent();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      global.isSyncing = false;
+    }
+  })();
 });
 
 const PORT = process.env.PORT || 3000;
