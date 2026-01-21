@@ -102,7 +102,6 @@
 //   };
 // }
 
-
 import {
   listNewFiles,
   downloadFile,
@@ -110,6 +109,7 @@ import {
   uploadState,
 } from "./dropbox.js";
 import { uploadToThinkific } from "./thinkific.js";
+const STATE_PATH = "/sync-state/state.json"; // dedicated folder in Dropbox
 
 export async function handleDropboxEvent() {
   console.log("Checking for new files...");
@@ -121,6 +121,8 @@ export async function handleDropboxEvent() {
 
   for (const entry of files) {
     if (state.processedFiles.includes(entry.id)) continue;
+    if (entry.path_lower === STATE_PATH.toLowerCase()) continue; // 🔹 skip state file
+    // if (processed.has(entry.id)) continue;
 
     console.log("New file:", entry.path_lower);
 
