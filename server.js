@@ -62,7 +62,6 @@
 // //   return expected === signature;
 // // }
 
-
 // import express from "express";
 // import { syncDropboxFolder } from "./sync.js";
 
@@ -96,10 +95,22 @@ app.get("/webhook/dropbox", (req, res) => {
 });
 
 // Dropbox webhook trigger
-app.post("/webhook/dropbox", (req, res) => {
+app.post("/webhook/dropbox", async (req, res) => {
+  res.sendStatus(200); // respond immediately
+
+  if (isSyncing) {
+    console.log("Sync already running, skipping");
+    return;
+  }
+
+  isSyncing = true;
   console.log("Dropbox webhook received");
-  handleDropboxEvent(); // async, don’t await
-  res.sendStatus(200);
+
+  try {
+    await handleDropboxEvent();
+  } finally {
+    isSyncing = false;
+  }
 });
 
 const PORT = process.env.PORT || 3000;
