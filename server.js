@@ -114,7 +114,7 @@ app.post("/webhook/dropbox", (req, res) => {
     } catch (err) {
       console.error(err);
     } finally {
-      global.isSyncing = false;
+      isSyncing = false;
     }
   })();
 });
