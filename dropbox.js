@@ -91,10 +91,6 @@
 // //   };
 // // }
 
-
-
-
-
 // // //////
 // import axios from "axios";
 
@@ -115,12 +111,14 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import { getDropboxAccessToken } from "./dropboxAuth.js";
 
 const LOCAL_DOWNLOAD_DIR = path.resolve("./downloads");
 if (!fs.existsSync(LOCAL_DOWNLOAD_DIR)) fs.mkdirSync(LOCAL_DOWNLOAD_DIR);
 
 export async function listNewFiles(cursor) {
   let res;
+  const token = await getDropboxAccessToken();
 
   if (!cursor) {
     res = await axios.post(
@@ -128,7 +126,7 @@ export async function listNewFiles(cursor) {
       { path: "", recursive: true },
       {
         headers: {
-          Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       }
@@ -139,7 +137,7 @@ export async function listNewFiles(cursor) {
       { cursor },
       {
         headers: {
-          Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       }
@@ -155,12 +153,14 @@ export async function downloadFile(entry) {
     LOCAL_DOWNLOAD_DIR,
     path.basename(entry.path_lower)
   );
+  const token = await getDropboxAccessToken();
+
   const res = await axios.request({
     method: "post",
     url: "https://content.dropboxapi.com/2/files/download",
     responseType: "stream",
     headers: {
-      Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${token}`,
       "Dropbox-API-Arg": JSON.stringify({ path: entry.path_lower }),
       "Content-Type": "application/octet-stream",
     },
@@ -179,13 +179,15 @@ export async function downloadFile(entry) {
 const STATE_PATH = "/sync-state/state.json"; // dedicated folder in Dropbox
 
 export async function downloadState() {
+  const token = await getDropboxAccessToken();
+
   try {
     const res = await axios({
       method: "post",
       url: "https://content.dropboxapi.com/2/files/download",
       responseType: "json",
       headers: {
-        Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${token}`,
         "Dropbox-API-Arg": JSON.stringify({ path: STATE_PATH }),
         "Content-Type": "application/octet-stream",
       },
@@ -198,11 +200,13 @@ export async function downloadState() {
 }
 
 export async function uploadState(state) {
+  const token = await getDropboxAccessToken();
+
   await axios({
     method: "post",
     url: "https://content.dropboxapi.com/2/files/upload",
     headers: {
-      Authorization: `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${token}`,
       "Dropbox-API-Arg": JSON.stringify({
         path: STATE_PATH,
         mode: "overwrite",
