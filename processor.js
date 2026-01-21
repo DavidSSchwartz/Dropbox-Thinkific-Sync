@@ -120,6 +120,7 @@ export async function handleDropboxEvent() {
   const { files, cursor } = await listNewFiles(state.cursor);
 
   for (const entry of files) {
+    console.log(entry)
     if (state.processedFiles.includes(entry.id)) continue;
     if (entry.path_lower === STATE_PATH.toLowerCase()) continue; // 🔹 skip state file
     // if (processed.has(entry.id)) continue;
