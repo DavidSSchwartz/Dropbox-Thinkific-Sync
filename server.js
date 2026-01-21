@@ -94,6 +94,8 @@ app.get("/webhook/dropbox", (req, res) => {
   res.send(req.query.challenge);
 });
 
+let isSyncing = false;
+
 // Dropbox webhook trigger
 app.post("/webhook/dropbox", async (req, res) => {
   res.sendStatus(200); // respond immediately
