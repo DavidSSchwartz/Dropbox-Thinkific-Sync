@@ -144,7 +144,7 @@ export async function handleDropboxEvent() {
   }
 
   // save state even if no new files
-  await uploadState({ ...state, cursor });
+  // await uploadState({ ...state, cursor });
 }
 
 function parsePath(pathStr) {
