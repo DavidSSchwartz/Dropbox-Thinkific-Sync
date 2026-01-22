@@ -1,6 +1,6 @@
-import { getOrCreateCourse } from "./courses";
-import { getOrCreateChapter } from "./chapters";
-import { createLesson } from "./lessons";
+import { getOrCreateCourse } from "./courses.js";
+import { getOrCreateChapter } from "./chapters.js";
+import { createLesson } from "./lessons.js";
 
 export async function uploadToThinkific({ filePath, parsed }) {
   const courseId = await getOrCreateCourse(parsed.course);
