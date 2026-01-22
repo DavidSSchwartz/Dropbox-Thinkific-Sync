@@ -120,7 +120,6 @@ export async function handleDropboxEvent() {
   const { files, cursor } = await listNewFiles(state.cursor);
 
   for (const entry of files) {
-    console.log(entry)
     if (state.processedFiles.includes(entry.id)) continue;
     if (entry.path_lower === STATE_PATH.toLowerCase()) continue; // 🔹 skip state file
     // if (processed.has(entry.id)) continue;
@@ -153,6 +152,8 @@ function parsePath(pathStr) {
     cycle: parts[0],
     course: parts[1],
     chapter: parts[2],
-    lessonName: parts[3],
+    lessonName: parts[3].toLowerCase().startsWith("e")
+      ? "Extra Maarei Mekomos"
+      : "Maarei Mekomos",
   };
 }
