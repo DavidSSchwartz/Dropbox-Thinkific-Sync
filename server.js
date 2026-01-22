@@ -350,7 +350,11 @@ async function a() {
 
 // console.log(JSON.stringify(response.data, null, 2));
 
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+
+puppeteer.use(StealthPlugin());
+
 const browser = await puppeteer.launch({
   headless: true,
   executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,

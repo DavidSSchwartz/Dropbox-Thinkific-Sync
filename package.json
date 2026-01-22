@@ -13,6 +13,8 @@
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "express": "^4.19.2",
-    "puppeteer": "^24.36.0"
+    "puppeteer": "^24.36.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
