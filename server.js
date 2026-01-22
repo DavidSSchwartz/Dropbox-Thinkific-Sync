@@ -356,25 +356,37 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
 
 const browser = await puppeteer.launch({
-  headless: true,
+  headless: "new",
   executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
   args: [
     "--no-sandbox",
     "--disable-setuid-sandbox",
     "--disable-dev-shm-usage",
     "--disable-gpu",
+    "--window-size=1920,1080",
   ],
 });
 
 const page = await browser.newPage();
-await page.goto("https://learn.vhalacha.com/users/sign_in");
 
-// Screenshot to see what page we're actually on
-await page.screenshot({ path: "/tmp/debug.png" });
+// Set cookies BEFORE navigating
+await page.setCookie({
+  name: "remember_user_token",
+  value: process.env.THINKIFIC_REMEMBER_TOKEN,
+  domain: "learn.vhalacha.com",
+  path: "/",
+  httpOnly: true,
+  secure: true,
+});
+
+// Go directly to admin page (skip login)
+await page.goto("https://learn.vhalacha.com/manage/courses/3330494", {
+  waitUntil: "networkidle2",
+  timeout: 60000,
+});
+
 console.log("Current URL:", page.url());
 console.log("Page title:", await page.title());
-const html = await page.content();
-console.log("Has email input:", html.includes("user[email]"));
 // const browser = await puppeteer.launch({
 //   headless: true,
 //   executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
