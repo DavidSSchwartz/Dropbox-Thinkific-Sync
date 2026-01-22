@@ -2,6 +2,7 @@
 // // import bodyParser from "body-parser";
 // // import crypto from "crypto";
 // // import { handleDropboxEvent } from "./processor.js";
+import axios from "axios";
 
 // // const app = express();
 
@@ -87,6 +88,7 @@
 import express from "express";
 import { handleDropboxEvent } from "./processor.js";
 import dotenv from "dotenv";
+import { getOrCreateCourse } from "./courses.js";
 
 dotenv.config()
 const app = express();
@@ -106,3 +108,16 @@ app.post("/webhook/dropbox", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+//  async function a() {
+//   console.log(process.env.THINKIFIC_API_KEY);
+//   let c = await axios.get("https://api.thinkific.com/api/public/v1/courses", {
+//     headers: {
+//       Authorization: `Bearer ${process.env.THINKIFIC_API_KEY}`,
+//       Accept: "application/json",
+//       "X-Auth-Subdomain": process.env.THINKIFIC_SUBDOMAIN, // Add this!
+//     },
+//   });
+//   console.log(c);
+// }
+// a();
