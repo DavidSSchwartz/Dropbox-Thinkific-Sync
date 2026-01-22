@@ -361,52 +361,72 @@ const browser = await puppeteer.launch({
     "--disable-gpu",
   ],
 });
+
 const page = await browser.newPage();
-
-// Login
 await page.goto("https://learn.vhalacha.com/users/sign_in");
-await page.type('input[name="user[email]"]', "virtualhalachaprogram@gmail.com");
-await page.type('input[name="user[password]"]', "RAVADAMVHP");
-await page.click('button[type="submit"]');
-console.log("navigating from login page")
-await page.waitForNavigation();
-// Go to course page to get all tokens loaded
-await page.goto("https://learn.vhalacha.com/manage/courses/3330494");
-console.log("on course page")
-await new Promise((r) => setTimeout(r, 3000));
-// Execute GraphQL request from within the browser context
-const result = await page.evaluate(async () => {
-  const response = await fetch("/api/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      operationName: "CreateChapter",
-      variables: {
-        name: "Chapter Created via Puppeteer 2!",
-        setNewLessonsToDraft: false,
-        courseId: "Q291cnNlLTMzMzA0OTQ=",
-      },
-      query: `mutation CreateChapter($courseId: ID!, $name: String!, $position: Int, $setNewLessonsToDraft: Boolean) {
-        createChapter(input: {courseId: $courseId, position: $position, name: $name, setNewLessonsToDraft: $setNewLessonsToDraft}) {
-          chapter {
-            id
-            name
-            position
-          }
-          userErrors {
-            code
-            message
-          }
-        }
-      }`,
-    }),
-    credentials: "include",
-  });
-  return await response.json();
-});
 
-console.log(JSON.stringify(result, null, 2));
+// Screenshot to see what page we're actually on
+await page.screenshot({ path: "/tmp/debug.png" });
+console.log("Current URL:", page.url());
+console.log("Page title:", await page.title());
+const html = await page.content();
+console.log("Has email input:", html.includes("user[email]"));
+// const browser = await puppeteer.launch({
+//   headless: true,
+//   executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
+//   args: [
+//     "--no-sandbox",
+//     "--disable-setuid-sandbox",
+//     "--disable-dev-shm-usage",
+//     "--disable-gpu",
+//   ],
+// });
+// const page = await browser.newPage();
 
-await browser.close();
+// // Login
+// await page.goto("https://learn.vhalacha.com/users/sign_in");
+// await page.type('input[name="user[email]"]', "virtualhalachaprogram@gmail.com");
+// await page.type('input[name="user[password]"]', "RAVADAMVHP");
+// await page.click('button[type="submit"]');
+// console.log("navigating from login page")
+// await page.waitForNavigation();
+// // Go to course page to get all tokens loaded
+// await page.goto("https://learn.vhalacha.com/manage/courses/3330494");
+// console.log("on course page")
+// await new Promise((r) => setTimeout(r, 3000));
+// // Execute GraphQL request from within the browser context
+// const result = await page.evaluate(async () => {
+//   const response = await fetch("/api/graphql", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       operationName: "CreateChapter",
+//       variables: {
+//         name: "Chapter Created via Puppeteer 2!",
+//         setNewLessonsToDraft: false,
+//         courseId: "Q291cnNlLTMzMzA0OTQ=",
+//       },
+//       query: `mutation CreateChapter($courseId: ID!, $name: String!, $position: Int, $setNewLessonsToDraft: Boolean) {
+//         createChapter(input: {courseId: $courseId, position: $position, name: $name, setNewLessonsToDraft: $setNewLessonsToDraft}) {
+//           chapter {
+//             id
+//             name
+//             position
+//           }
+//           userErrors {
+//             code
+//             message
+//           }
+//         }
+//       }`,
+//     }),
+//     credentials: "include",
+//   });
+//   return await response.json();
+// });
+
+// console.log(JSON.stringify(result, null, 2));
+
+// await browser.close();
