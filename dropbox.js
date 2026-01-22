@@ -119,7 +119,7 @@ if (!fs.existsSync(LOCAL_DOWNLOAD_DIR)) fs.mkdirSync(LOCAL_DOWNLOAD_DIR);
 export async function listNewFiles(cursor) {
   let res;
   const token = await getDropboxAccessToken();
-
+  console.log({ token });
   if (!cursor) {
     res = await axios.post(
       "https://api.dropboxapi.com/2/files/list_folder",

@@ -5,7 +5,8 @@ export async function getDropboxAccessToken() {
   if (global.__DROPBOX_TOKEN__) {
     return global.__DROPBOX_TOKEN__;
   }
-
+console.log(process.env.DROPBOX_APP_KEY)
+console.log(process.env.DROPBOX_APP_SECRET)
   const res = await axios.post(
     "https://api.dropboxapi.com/oauth2/token",
     new URLSearchParams({
