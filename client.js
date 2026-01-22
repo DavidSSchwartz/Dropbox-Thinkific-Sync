@@ -3,7 +3,7 @@ import axios from "axios";
 export const thinkific = axios.create({
   baseURL: "https://api.thinkific.com/api/public/v2",
   headers: {
-    "X-Auth-API-Key": process.env.THINKIFIC_API_KEY,
+    Authorization: `Bearer ${process.env.THINKIFIC_API_KEY}`,
     "X-Auth-Subdomain": process.env.THINKIFIC_SUBDOMAIN,
     "Content-Type": "application/json",
     Accept: "application/json",
